@@ -7,6 +7,7 @@ app.use(require('morgan')('dev'));
 app.use(express.json());
 
 app.use(require('./api/auth').router);
+app.use('/user', require('./api/user'));
 
 // Logging middleware
 app.use((req, res, next) => {
