@@ -3,33 +3,18 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const prisma = require('../prisma');
+const JWT_SECRET = process.env.JWT_SECRET;
 
 function createToken(id) {
-  const JWT_SECRET = process.env.JWT_SECRET;
   return jwt.sign({ id }, JWT_SECRET, { expiresIn: '2h' });
 }
 
-router.use(async (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  const token = authHeader?.slice(7);
-  if (!token) {
-    return next();
-  }
-  try {
-    const { id } = jwt.verify(token, JWT_SECRET);
-    const user = await prisma.user.findUniqueOrThrow({ where: { id } });
-    req.user = user;
-    next();
-  } catch (e) {
-    next(e);
-  }
-});
-
 router.post('/register', async (req, res, next) => {
-  const { username, password } = req.body;
+  const { username, password, email } = req.body;
   try {
     const user = await prisma.user.create({
       data: {
+        email,
         username,
         password: await bcrypt.hash(password, 10),
       },
@@ -43,9 +28,33 @@ router.post('/register', async (req, res, next) => {
 router.post('/login', async (req, res, next) => {
   const { username, password } = req.body;
   try {
-    const user = await prisma.user.login(username, password);
+    const user = await prisma.user.findFirstOrThrow({
+      where: {
+        username,
+      },
+    });
+    const match = bcrypt.compare(password, user.password);
+    if (!match) {
+      return next({ status: 401, message: 'Invalid login.' });
+    }
     const token = createToken(user.id);
     res.json({ token });
+  } catch (e) {
+    next(e);
+  }
+});
+
+router.use(async (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  const token = authHeader?.slice(7);
+  if (!token) {
+    return next();
+  }
+  try {
+    const { id } = jwt.verify(token, JWT_SECRET);
+    const user = await prisma.user.findUniqueOrThrow({ where: { id } });
+    req.user = user;
+    next();
   } catch (e) {
     next(e);
   }
