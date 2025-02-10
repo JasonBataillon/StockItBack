@@ -1,12 +1,12 @@
+require('dotenv').config();
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const prisma = require('../prisma');
-const JWT_SECRET = process.env.JWT_SECRET;
 
 function createToken(id) {
-  return jwt.sign({ id }, JWT_SECRET, { expiresIn: '2h' });
+  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '2h' });
 }
 
 router.post('/register', async (req, res, next) => {
@@ -51,7 +51,7 @@ router.use(async (req, res, next) => {
     return next();
   }
   try {
-    const { id } = jwt.verify(token, JWT_SECRET);
+    const { id } = jwt.verify(token, process.env.JWT_SECRET);
     const user = await prisma.user.findUniqueOrThrow({ where: { id } });
     req.user = user;
     next();
