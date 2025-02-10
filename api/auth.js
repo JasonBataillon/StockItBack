@@ -6,7 +6,8 @@ const bcrypt = require('bcrypt');
 const prisma = require('../prisma');
 
 function createToken(id) {
-  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '2h' });
+  const token = jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '2h' });
+  return token;
 }
 
 router.post('/register', async (req, res, next) => {
@@ -19,6 +20,7 @@ router.post('/register', async (req, res, next) => {
         password: await bcrypt.hash(password, 10),
       },
     });
+    console.log(user);
     res.status(201).json({ token: createToken(user.id) });
   } catch (e) {
     next(e);
