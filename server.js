@@ -4,7 +4,8 @@ const app = express();
 const PORT = 3000;
 const cors = require('cors');
 
-app.use(cors({ origin: 'https://stockitback.onrender.com' }));
+// app.use(cors({ origin: 'https://stockitback.onrender.com' }));
+app.use(cors());
 app.use(require('morgan')('dev'));
 app.use(express.json());
 
