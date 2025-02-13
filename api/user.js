@@ -1,6 +1,31 @@
 const express = require('express');
 const router = express.Router();
-module.exports = router;
+const prisma = require('../prisma');
+const { authenticate } = require('./auth');
+
+router.post('/add', authenticate, async (req, res, next) => {
+  const { stockTicker } = req.body;
+  const userId = req.user.id;
+
+  try {
+    const stock = await prisma.stock.upsert({
+      where: { symbol: stockTicker },
+      update: {},
+      create: { symbol: stockTicker },
+    });
+
+    const watchlist = await prisma.watchlist.create({
+      data: {
+        userId,
+        stockId: stock.id,
+      },
+    });
+
+    res.status(201).json(watchlist);
+  } catch (error) {
+    next(error);
+  }
+});
 
 const prisma = require('../prisma');
 
@@ -27,3 +52,5 @@ router.get('/:id', async (req, res, next) => {
     next(e);
   }
 });
+
+module.exports = router;
