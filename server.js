@@ -1,12 +1,15 @@
 const express = require('express');
 const app = express();
 const PORT = 3000;
+const cors = require('cors');
 
+app.use(cors());
 app.use(require('morgan')('dev'));
 app.use(express.json());
 
 app.use(require('./api/auth').router);
 app.use('/user', require('./api/user'));
+app.use('/api/watchlist', require('./api/watchlist'));
 
 // Logging middleware
 app.use((req, res, next) => {
