@@ -27,8 +27,6 @@ router.post('/add', authenticate, async (req, res, next) => {
   }
 });
 
-const prisma = require('../prisma');
-
 router.get('/', async (req, res, next) => {
   try {
     const users = await prisma.user.findMany();
