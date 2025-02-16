@@ -6,9 +6,31 @@ const bcrypt = require('bcrypt');
 const prisma = require('../prisma');
 
 function createToken(id) {
-  const token = jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '2h' });
+  const token = jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: '2h',
+    algorithm: 'HS256',
+  });
   return token;
 }
+
+router.use(async (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  const token = authHeader?.slice(7);
+  if (!token) {
+    return next();
+  }
+  try {
+    const { id } = jwt.verify(token, process.env.JWT_SECRET, {
+      algorithm: 'HS256',
+    });
+    const user = await prisma.user.findUniqueOrThrow({ where: { id } });
+    req.user = user;
+    next();
+  } catch (e) {
+    next(e);
+    res.status(401).json({ message: 'Unauthorized' });
+  }
+});
 
 router.post('/register', async (req, res, next) => {
   const { username, password, email } = req.body;
@@ -41,22 +63,6 @@ router.post('/login', async (req, res, next) => {
     }
     const token = createToken(user.id);
     res.json({ token });
-  } catch (e) {
-    next(e);
-  }
-});
-
-router.use(async (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  const token = authHeader?.slice(7);
-  if (!token) {
-    return next();
-  }
-  try {
-    const { id } = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await prisma.user.findUniqueOrThrow({ where: { id } });
-    req.user = user;
-    next();
   } catch (e) {
     next(e);
   }

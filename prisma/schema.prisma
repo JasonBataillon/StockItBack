@@ -28,7 +28,7 @@ model Stock {
   symbol     String      @unique
   name       String
   price      Float
-  marketCap  Float
+  marketCap  Float?
   watchlists Watchlist[]
 }
 
