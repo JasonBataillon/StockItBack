@@ -10,7 +10,7 @@ app.use(express.json());
 
 app.use(require('./api/auth').router);
 app.use('/user', require('./api/user'));
-app.use('/api/watchlist', require('./api/watchlist'));
+app.use('/watchlist', require('./api/watchlist'));
 
 // Logging middleware
 app.use((req, res, next) => {
