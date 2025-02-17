@@ -1,8 +1,8 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const prisma = require('../prisma');
+const prisma = require("../prisma");
 
-router.get('/', async (req, res, next) => {
+router.get("/", async (req, res, next) => {
   try {
     const users = await prisma.user.findMany();
     res.json(users);
@@ -11,7 +11,7 @@ router.get('/', async (req, res, next) => {
   }
 });
 
-router.get('/:id', async (req, res, next) => {
+router.get("/:id", async (req, res, next) => {
   const { id } = req.params;
   try {
     const user = await prisma.user.findUnique({
