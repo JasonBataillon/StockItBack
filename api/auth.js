@@ -14,6 +14,9 @@ function createToken(id) {
 }
 
 router.use(async (req, res, next) => {
+  if (req.path === '/register') {
+    return next();
+  }
   const authHeader = req.headers.authorization;
   const token = authHeader?.slice(7);
   if (!token) {
@@ -27,7 +30,6 @@ router.use(async (req, res, next) => {
     req.user = user;
     next();
   } catch (e) {
-    next(e);
     res.status(401).json({ message: 'Unauthorized' });
   }
 });
@@ -35,6 +37,7 @@ router.use(async (req, res, next) => {
 router.post('/register', async (req, res, next) => {
   const { username, password, email } = req.body;
   try {
+    console.log('Registering user:', { username, email });
     const user = await prisma.user.create({
       data: {
         email,
@@ -45,6 +48,7 @@ router.post('/register', async (req, res, next) => {
     console.log(user);
     res.status(201).json({ token: createToken(user.id) });
   } catch (e) {
+    console.error('Registration error:', e);
     next(e);
   }
 });
