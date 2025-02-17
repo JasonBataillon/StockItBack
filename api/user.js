@@ -1,10 +1,9 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 const prisma = require('../prisma');
 const { authenticate } = require('./auth');
-const e = require('express');
 
-router.get('/', async (req, res, next) => {
+router.get("/", async (req, res, next) => {
   try {
     const users = await prisma.user.findMany();
     res.json(users);
