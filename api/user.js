@@ -1,9 +1,9 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
 const prisma = require('../prisma');
 const { authenticate } = require('./auth');
 
-router.get("/", async (req, res, next) => {
+router.get('/', async (req, res, next) => {
   try {
     const users = await prisma.user.findMany();
     res.json(users);
@@ -21,7 +21,7 @@ router.get('/watchlist', authenticate, async (req, res, next) => {
       include: { watchlists: true },
     });
     if (user) {
-      res.json(user.watchlists);
+      res.json({ username: user.username, watchlists: user.watchlists });
     } else {
       res.status(404).json({ message: 'User not found' });
     }
