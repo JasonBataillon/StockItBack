@@ -34,8 +34,10 @@ model Stock {
 
 model Watchlist {
   id      String @id @default(uuid())
-  userId  String @unique
+  userId  String
   stockId String
   user    User   @relation(fields: [userId], references: [id])
   stock   Stock  @relation(fields: [stockId], references: [id])
+
+  @@unique([userId, stockId])
 }

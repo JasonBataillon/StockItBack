@@ -18,7 +18,7 @@ router.get('/watchlist', authenticate, async (req, res, next) => {
     console.log('id:', id);
     const user = await prisma.user.findUnique({
       where: { id: String(id) },
-      include: { watchlists: true },
+      include: { watchlists: { include: { stock: true } } },
     });
     if (user) {
       res.json({ username: user.username, watchlists: user.watchlists });
