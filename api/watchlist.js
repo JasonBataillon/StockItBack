@@ -32,7 +32,7 @@ router.post('/add', authenticate, async (req, res, next) => {
 
     if (existingWatchlist) {
       console.log(`Watchlist already contains this stock: ${stockTicker}`);
-      return res.status(400).json(existingWatchlist);
+      return res.status(400).json({ message: 'Stock already in watchlist' });
     }
 
     const watchlist = await prisma.watchlist.create({
