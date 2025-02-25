@@ -49,4 +49,34 @@ router.post('/add', authenticate, async (req, res, next) => {
   }
 });
 
+// Add the DELETE endpoint to remove a stock from the user's watchlist
+router.delete('/:symbol', authenticate, async (req, res) => {
+  const { symbol } = req.params;
+  const userId = req.user.id; // Assuming you have user authentication
+
+  try {
+    // Find the stock by symbol
+    const stock = await prisma.stock.findUnique({
+      where: { symbol },
+    });
+
+    if (!stock) {
+      return res.status(404).json({ message: 'Stock not found' });
+    }
+
+    // Remove the stock from the user's watchlist in the database
+    await prisma.watchlist.deleteMany({
+      where: {
+        userId: userId,
+        stockId: stock.id,
+      },
+    });
+
+    res.status(200).json({ message: 'Stock removed from watchlist' });
+  } catch (error) {
+    console.error('Error removing stock from watchlist:', error);
+    res.status(500).json({ message: 'Error removing stock from watchlist' });
+  }
+});
+
 module.exports = router;
