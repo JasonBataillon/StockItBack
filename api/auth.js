@@ -61,9 +61,13 @@ router.post('/login', async (req, res, next) => {
         username,
       },
     });
-    const match = bcrypt.compare(password, user.password);
+    const match = await bcrypt.compare(password, user.password); // Await the bcrypt.compare function
     if (!match) {
-      return next({ status: 401, message: 'Invalid login.' });
+      return res
+        .status(401)
+        .json({
+          message: 'Username or password is incorrect. Please try again.',
+        });
     }
     const token = createToken(user.id);
     res.json({ token });
