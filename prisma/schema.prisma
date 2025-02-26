@@ -14,22 +14,25 @@ datasource db {
 }
 
 model User {
-  id         String      @id @default(uuid())
-  email      String      @unique
-  username   String
-  password   String
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
-  watchlists Watchlist[]
+  id          String       @id @default(uuid())
+  email       String       @unique
+  username    String
+  password    String
+  wallet      Float        @default(0.0)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  watchlists  Watchlist[]
+  ownedStocks OwnedStock[]
 }
 
 model Stock {
-  id         String      @id @default(uuid())
-  symbol     String      @unique
+  id         String       @id @default(uuid())
+  symbol     String       @unique
   name       String
   price      Float
   marketCap  Float?
   watchlists Watchlist[]
+  OwnedStock OwnedStock[]
 }
 
 model Watchlist {
@@ -40,4 +43,15 @@ model Watchlist {
   stock   Stock  @relation(fields: [stockId], references: [id])
 
   @@unique([userId, stockId])
+}
+
+model OwnedStock {
+  userId   String
+  stockId  String
+  shares   Int
+  avgPrice Float
+  user     User   @relation(fields: [userId], references: [id])
+  stock    Stock  @relation(fields: [stockId], references: [id])
+
+  @@id([userId, stockId])
 }

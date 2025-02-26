@@ -43,6 +43,7 @@ router.post('/register', async (req, res, next) => {
         email,
         username,
         password: await bcrypt.hash(password, 10),
+        wallet: 5000.0, // Initialize wallet with $5,000
       },
     });
     console.log(user);
@@ -63,11 +64,9 @@ router.post('/login', async (req, res, next) => {
     });
     const match = await bcrypt.compare(password, user.password); // Await the bcrypt.compare function
     if (!match) {
-      return res
-        .status(401)
-        .json({
-          message: 'Username or password is incorrect. Please try again.',
-        });
+      return res.status(401).json({
+        message: 'Username or password is incorrect. Please try again.',
+      });
     }
     const token = createToken(user.id);
     res.json({ token });
