@@ -4,6 +4,7 @@ const prisma = require('../prisma');
 const { authenticate } = require('./auth');
 const { fetchStockPrice } = require('../api/stockUtils');
 
+// Route to get all users
 router.get('/', async (req, res, next) => {
   try {
     const users = await prisma.user.findMany();
@@ -13,10 +14,10 @@ router.get('/', async (req, res, next) => {
   }
 });
 
+// Route to get the authenticated user's watchlist and owned stocks
 router.get('/watchlist', authenticate, async (req, res, next) => {
   const { id } = req.user;
   try {
-    console.log('id:', id);
     const user = await prisma.user.findUnique({
       where: { id: String(id) },
       include: {
@@ -39,15 +40,10 @@ router.get('/watchlist', authenticate, async (req, res, next) => {
   }
 });
 
+// Route to buy stocks
 router.post('/buy', authenticate, async (req, res, next) => {
   const { id } = req.user;
   const { stockData, amount: amountString } = req.body;
-  console.log(`Incoming request to /buy endpoint`);
-  console.log(`User ID: ${id}`);
-  console.log(`Request body:`, req.body);
-  console.log(
-    `Buying stock: ${stockData.stockName}, amount: ${amountString}, price: ${stockData.stockPrice}`
-  );
 
   try {
     if (
@@ -133,6 +129,7 @@ router.post('/buy', authenticate, async (req, res, next) => {
   }
 });
 
+// Route to sell stocks
 router.post('/sell', authenticate, async (req, res, next) => {
   const { id } = req.user;
   const { symbol, amount: amountString } = req.body;
@@ -176,7 +173,7 @@ router.post('/sell', authenticate, async (req, res, next) => {
       return res.status(400).json({ message: 'Not enough shares to sell' });
     }
 
-    const remainingShares = ownedStock.shares - amount; // Calculate remaining shares
+    const remainingShares = ownedStock.shares - amount;
 
     if (remainingShares > 0) {
       await prisma.ownedStock.update({
@@ -191,7 +188,6 @@ router.post('/sell', authenticate, async (req, res, next) => {
         },
       });
     } else {
-      // Delete the ownedStock record if remaining shares are zero
       await prisma.ownedStock.delete({
         where: {
           userId_stockId: {

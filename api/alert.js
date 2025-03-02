@@ -1,22 +1,28 @@
-const express = require("express");
-const app = express();
+const express = require('express');
 const router = express.Router();
 
+// Middleware to parse JSON request bodies
 router.use(express.json());
 
+// Initial stock data
 let stockData = {
-  name: "AAPL",
+  name: 'AAPL',
   currentPrice: 100,
   previousPrice: 95,
 };
 
-router.get("/api/stock", (req, res) => {
+// Route to get the current stock data
+router.get('/api/stock', (req, res) => {
+  // Respond with the current stock data
   res.json(stockData);
 });
 
-router.post("/api/stock", (req, res) => {
+// Route to update the stock data
+router.post('/api/stock', (req, res) => {
   const { name, currentPrice, previousPrice } = req.body;
+  // Update the stock data
   stockData = { name, currentPrice, previousPrice };
+  // Respond with the updated stock data
   res.json(stockData);
 });
 
