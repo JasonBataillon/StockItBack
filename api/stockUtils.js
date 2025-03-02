@@ -1,5 +1,6 @@
 require('dotenv').config();
 
+// Function to fetch the previous day's stock price for a given symbol
 async function fetchStockPrice(symbol) {
   const API_KEY = process.env.VITE_POLYGON_API_KEY;
   try {
@@ -17,7 +18,9 @@ async function fetchStockPrice(symbol) {
       );
     }
     const data = await response.json();
+    // Check if the response contains valid data
     if (data && data.results && data.results.length > 0 && data.results[0].c) {
+      // Return the closing price
       return data.results[0].c;
     } else {
       console.error('API returned invalid data', data);
